@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CP6-DotNet")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8c7de4dce363a5b2c1c2ee0328778e6713d84341")]
 [assembly: System.Reflection.AssemblyProductAttribute("CP6-DotNet")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CP6-DotNet")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
