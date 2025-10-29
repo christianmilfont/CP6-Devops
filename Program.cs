@@ -3,32 +3,39 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// =====================
+// Serviços (Dependency Injection)
+// =====================
 
-
-// Configurando o DbContext
+// Configurando o DbContext com MySQL
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
         new MySqlServerVersion(new Version(8, 0, 36))
     ));
+
 // Adicionando os controllers
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+
+// Configurando o Swagger / OpenAPI
+builder.Services.AddEndpointsApiExplorer(); // necessário para gerar endpoints no Swagger
+builder.Services.AddSwaggerGen();           // habilita a interface Swagger UI
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// =====================
+// Pipeline de execução
+// =====================
+
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    // Gera e exibe a documentação Swagger
+    app.UseSwagger();     // gera o JSON do OpenAPI
+    app.UseSwaggerUI();   // gera a interface web (Swagger UI)
 }
 
-//app.UseHttpsRedirection();
-
+// app.UseHttpsRedirection(); // opcional, dependendo se há SSL configurado
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
