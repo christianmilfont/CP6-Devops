@@ -1,9 +1,7 @@
-using CP6_DotNet.Model;
-using System.Collections.Generic;
-using System.Reflection.Emit;
 using Microsoft.EntityFrameworkCore;
+using CP6_DotNet.Model;
  
-namespace CP6_DotNet.Context
+namespace CP6_DotNet.Data
 {
     public class AppDbContext : DbContext
     {
@@ -16,12 +14,12 @@ namespace CP6_DotNet.Context
         {
             base.OnModelCreating(modelBuilder);
  
-            // Configurando o relacionamento
+            // Relacionamento opcional
             modelBuilder.Entity<Livro>()
-                .HasOne(l => l.Autor)
-                .WithMany(a => a.Livros)
-                .HasForeignKey(l => l.AutorId)
-                .OnDelete(DeleteBehavior.Cascade); // Quando um autor for deletado, seus livros também serão
+                        .HasOne(l => l.Autor)
+                        .WithMany(a => a.Livros)
+                        .HasForeignKey(l => l.AutorId)
+                        .OnDelete(DeleteBehavior.SetNull); // se o autor for deletado, o livro permanece sem autor
         }
     }
 }
