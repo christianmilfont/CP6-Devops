@@ -28,7 +28,8 @@ mysql --protocol=TCP -h"$DbHost" -P"$DbPort" -u"$DbUser" -p"$DbPass" \
 # =======================
 # Criar tabelas se não existirem
 # =======================
-echo "Criando tabelas se não existirem..."
+echo "Criando tabelas 'Autores' e 'Livros' se não existirem..."
+ 
 mysql --protocol=TCP -h"$DbHost" -P"$DbPort" -u"$DbUser" -p"$DbPass" "$DbName" <<'SQL'
 CREATE TABLE IF NOT EXISTS Autores (
   Id INT AUTO_INCREMENT PRIMARY KEY,
@@ -38,20 +39,19 @@ CREATE TABLE IF NOT EXISTS Autores (
 CREATE TABLE IF NOT EXISTS Livros (
   Id INT AUTO_INCREMENT PRIMARY KEY,
   Titulo VARCHAR(255) NOT NULL,
-  AutorId INT NOT NULL,
+  AutorId INT NULL,
   CONSTRAINT FK_Livros_Autores
     FOREIGN KEY (AutorId)
     REFERENCES Autores(Id)
-    ON DELETE CASCADE
+    ON DELETE SET NULL
 );
-
  
 -- Verifica se o índice já existe
 SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS 
-WHERE table_schema = DATABASE() AND table_name = 'Livros' AND index_name = 'IX_Livros_AutoresId' LIMIT 1;
+WHERE table_schema = DATABASE() AND table_name = 'Livros' AND index_name = 'IX_Livros_AutorId' LIMIT 1;
  
 -- Se não existir, cria o índice
-CREATE INDEX IX_Livro_AutoresId ON Livros (AutoresId);
+CREATE INDEX  IX_Livros_AutorId ON Livros (AutorId);
 SQL
  
 echo "[OK] Banco e tabelas prontos"
