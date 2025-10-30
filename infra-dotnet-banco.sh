@@ -40,7 +40,7 @@ az acr create \
   --resource-group "$RESOURCE_GROUP" \
   --name "$ACR_NAME" \
   --sku Basic \
-  --admin-enabled true 1>/dev/null
+  --admin-enabled false 1>/dev/null
 
 # Captura credenciais do ACR
 ACR_USERNAME=$(az acr credential show -n "$ACR_NAME" --query username -o tsv)
