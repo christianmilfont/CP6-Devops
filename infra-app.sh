@@ -4,26 +4,32 @@ set -euo pipefail
 # ==========================
 # Parâmetros da Conexão MySQL
 # ==========================
-DbHost="${DbHost:?DbHost ausente}"         # Define a variável de ambiente DbHost
-DbPort="${DbPort:?DbPort ausente}"         # Define a variável de ambiente DbPort
-DbName="${DbName:?DbName ausente}"         # Define a variável de ambiente DbName
-DbUser="${DbUser:?DbUser ausente}"         # Define a variável de ambiente DbUser
-DbPass="${DbPass:?DbPass ausente}"         # Define a variável de ambiente DbPass
+DbHost="${DbHost:?DbHost ausente}"
+DbPort="${DbPort:?DbPort ausente}"
+DbName="${DbName:?DbName ausente}"
+DbUser="${DbUser:?DbUser ausente}"
+DbPass="${DbPass:?DbPass ausente}"
 
 # =======================
-# Atividades do MySQL
+# Validação do cliente MySQL
 # =======================
 if ! command -v mysql >/dev/null 2>&1; then
   echo "ERRO: cliente 'mysql' não encontrado. Instale-o antes de executar este script."
   exit 1
 fi
 
-echo "Criando banco de dados se não existir..."
-mysql --protocol=TCP -h"$DbHost" -P"$DbPort" -u"$DbUser" -p"$DbPass" -e "CREATE DATABASE IF NOT EXISTS \`$DbName\`;"
+# =======================
+# Criar banco de dados se não existir
+# =======================
+echo "Criando banco de dados '$DbName' se não existir..."
+mysql --protocol=TCP -h"$DbHost" -P"$DbPort" -u"$DbUser" -p"$DbPass" \
+  -e "CREATE DATABASE IF NOT EXISTS \`$DbName\`;"
 
-
-echo "Criando Script de Banco..."
-cat > cria_objetos.sql <<'SQL'
+# =======================
+# Criar tabelas se não existirem
+# =======================
+echo "Criando tabelas se não existirem..."
+mysql --protocol=TCP -h"$DbHost" -P"$DbPort" -u"$DbUser" -p"$DbPass" "$DbName" <<'SQL'
 CREATE TABLE IF NOT EXISTS Autor (
   Id INT AUTO_INCREMENT PRIMARY KEY,
   Nome VARCHAR(255) NOT NULL
@@ -39,17 +45,14 @@ CREATE TABLE IF NOT EXISTS Livro (
     ON DELETE CASCADE
 );
 
-CREATE INDEX IX_Livro_AutorId ON Livro (AutorId);
+CREATE INDEX IF NOT EXISTS IX_Livro_AutorId ON Livro (AutorId);
 SQL
 
-echo "Executando cria_objetos.sql..."
-mysql --protocol=TCP -h"$DbHost" -P"$DbPort" -u"$DbUser" -p"$DbPass" "$DbName" < cria_objetos.sql
-echo "[OK] Objetos do BD prontos"
+echo "[OK] Banco e tabelas prontos"
 
-
-# ===================
-# Atividades da Azure
-# ===================
+# =======================
+# Azure WebApp (mantido)
+# =======================
 rg="rg-api-dotnet"
 location=${LOCATION:-"eastus"}
 plan="planApiDotnet"
@@ -57,22 +60,21 @@ app=${NOME_WEBAPP:-"meu-app-dotnet"}
 runtime="dotnet:8"
 sku="F1"
 
-echo "Criando Grupo de Recursos..."
+echo "Criando Grupo de Recursos se não existir..."
 az group create --name "$rg" --location "$location" 1>/dev/null
 
-echo "Criando Plano de Serviço..."
+echo "Criando Plano de Serviço se não existir..."
 az appservice plan create --name "$plan" --resource-group "$rg" --location "$location" --sku "$sku" 1>/dev/null
 
-echo "Criando Serviço de Aplicativo..."
+echo "Criando Serviço de Aplicativo se não existir..."
 az webapp create --resource-group "$rg" --plan "$plan" --runtime "$runtime" --name "$app" 1>/dev/null
 
-# Captura estado atual dos logs
+# Configura logs apenas se necessário
 app_logging="$(az webapp log show -g "$rg" -n "$app" --query 'applicationLogs.fileSystem.level' -o tsv 2>/dev/null || true)"
 ws_logging="$(az webapp log show -g "$rg" -n "$app" --query 'httpLogs.fileSystem.enabled' -o tsv 2>/dev/null || true)"
 det_errors="$(az webapp log show -g "$rg" -n "$app" --query 'detailedErrorMessages.enabled' -o tsv 2>/dev/null || true)"
 failed_req="$(az webapp log show -g "$rg" -n "$app" --query 'failedRequestsTracing.enabled' -o tsv 2>/dev/null || true)"
 
-# Condição: aplicar somente se algo não estiver habilitado como desejado
 if [ "$app_logging" != "Information" ] || [ "$ws_logging" != "true" ] || [ "$det_errors" != "true" ] || [ "$failed_req" != "true" ]; then
   echo "Habilitando Logs do Serviço de Aplicativo..."
   az webapp log config \
@@ -87,4 +89,4 @@ else
   echo "Logs já configurados"
 fi
 
-echo "[OK] Objetos da Azure prontos"
+echo "[OK] Azure WebApp configurado"
