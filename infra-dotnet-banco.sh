@@ -11,7 +11,7 @@ LOCATION="eastus"
 ACI_APP_NAME="${APP_NAME}-app"
 ACI_DB_NAME="${APP_NAME}-db"
 
-# Sufixo aleatório para nomes únicos
+# Gera sufixo aleatório para nomes únicos
 SUFFIX=$(head /dev/urandom | tr -dc 'a-z0-9' | fold -w5 | head -n1)
 ACR_NAME="${APP_NAME}acr${SUFFIX}"
 
@@ -27,7 +27,7 @@ MYSQL_DATABASE="ProjetoAutorLivroDb"
 # LOGIN E RESOURCE GROUP
 # ================================
 echo "🔐 Verificando login no Azure..."
-az account show &>/dev/null
+az account show &>/dev/null || az login
 
 echo "📁 Criando Resource Group..."
 az group create --name "$RESOURCE_GROUP" --location "$LOCATION" 1>/dev/null
@@ -45,6 +45,15 @@ az acr create \
 # Captura credenciais do ACR
 ACR_USERNAME=$(az acr credential show -n "$ACR_NAME" --query username -o tsv)
 ACR_PASSWORD=$(az acr credential show -n "$ACR_NAME" --query passwords[0].value -o tsv)
+
+# ================================
+# IMPORTAR IMAGEM MYSQL PARA O ACR
+# ================================
+echo "📥 Importando imagem MySQL para o ACR..."
+az acr import \
+  --name "$ACR_NAME" \
+  --source docker.io/library/mysql:8.0 \
+  --image mysql:8.0
 
 # ================================
 # BUILD LOCAL DA IMAGEM .NET
@@ -66,16 +75,19 @@ az container delete --name "$ACI_APP_NAME" --resource-group "$RESOURCE_GROUP" --
 sleep 10
 
 # ================================
-# CRIAR MYSQL NO ACI
+# CRIAR MYSQL NO ACI (usando ACR)
 # ================================
 echo "🛢️ Criando container MySQL..."
 az container create \
   --resource-group "$RESOURCE_GROUP" \
   --name "$ACI_DB_NAME" \
-  --image "mysql:8.0" \
+  --image "${ACR_NAME}.azurecr.io/mysql:8.0" \
   --cpu 1 --memory 1.5 \
   --ip-address public \
   --ports $MYSQL_PORT \
+  --registry-login-server "${ACR_NAME}.azurecr.io" \
+  --registry-username "$ACR_USERNAME" \
+  --registry-password "$ACR_PASSWORD" \
   --environment-variables \
       MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" \
       MYSQL_DATABASE="$MYSQL_DATABASE" \
