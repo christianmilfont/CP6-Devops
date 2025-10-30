@@ -77,6 +77,7 @@ az container create \
   --environment-variables \
     MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" \
     MYSQL_DATABASE="$MYSQL_DATABASE" \
+    MYSQL_ROOT_HOST="%" \
   --restart-policy Always \
   --os-type Linux
 
