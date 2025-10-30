@@ -1,9 +1,11 @@
-﻿namespace CP6_DotNet.Model
+namespace CP6_DotNet.Model
 {
     public class Autor
     {
         public int Id { get; set; }
         public string Nome { get; set; }
-        public List<Livro> Livros { get; set; } // Relacionamento um-para-muitos
+ 
+        // Um Autor pode ter zero ou mais livros
+        public ICollection<Livro> Livros { get; set; } = new List<Livro>();
     }
 }
