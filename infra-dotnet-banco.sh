@@ -47,13 +47,15 @@ ACR_USERNAME=$(az acr credential show -n "$ACR_NAME" --query username -o tsv)
 ACR_PASSWORD=$(az acr credential show -n "$ACR_NAME" --query passwords[0].value -o tsv)
 
 # ================================
-# BUILD DA IMAGEM .NET DIRETO NO ACR
+# BUILD LOCAL DA IMAGEM .NET
 # ================================
-echo "⚙️  Buildando a imagem .NET diretamente no ACR..."
-az acr build \
-  --registry "$ACR_NAME" \
-  --image "${APP_NAME}:latest" \
-  .
+IMAGE_NAME="${ACR_NAME}.azurecr.io/${APP_NAME}:latest"
+echo "⚙️  Buildando imagem .NET localmente..."
+docker build -t "$IMAGE_NAME" .
+
+echo "📤 Enviando imagem para o ACR..."
+az acr login --name "$ACR_NAME"
+docker push "$IMAGE_NAME"
 
 # ================================
 # LIMPAR CONTAINERS ANTIGOS
@@ -90,7 +92,7 @@ echo "🚀 Criando container da aplicação .NET..."
 az container create \
   --resource-group "$RESOURCE_GROUP" \
   --name "$ACI_APP_NAME" \
-  --image "${ACR_NAME}.azurecr.io/${APP_NAME}:latest" \
+  --image "$IMAGE_NAME" \
   --cpu 1 --memory 1.5 \
   --ip-address public \
   --ports $APP_PORT \
