@@ -18,9 +18,9 @@ namespace CP6_DotNet.Context
  
             // Configurando o relacionamento
             modelBuilder.Entity<Livro>()
-                .HasOne(l => l.Autores)
+                .HasOne(l => l.Autor)
                 .WithMany(a => a.Livros)
-                .HasForeignKey(l => l.AutoresId)
+                .HasForeignKey(l => l.AutorId)
                 .OnDelete(DeleteBehavior.Cascade); // Quando um autor for deletado, seus livros também serão
         }
     }
