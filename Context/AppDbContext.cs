@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using CP6_DotNet.Model;
  
-namespace CP6_DotNet.Data
+namespace CP6_DotNet.Context
 {
     public class AppDbContext : DbContext
     {
