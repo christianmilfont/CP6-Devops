@@ -4,11 +4,11 @@ set -euo pipefail
 # ==========================
 # Parâmetros da Conexão MySQL
 # ==========================
-DbHost="${1:-20.241.181.58}"
-DbPort="${2:-3306}"
-DbName="${3:-ProjetoAutorLivroDb}"
-DbUser="${4:-root}"
-DbPass="${5:-senha123}"
+DbHost="${1:?DbHost ausente}"
+DbPort="${2:?DbPort ausente}"
+DbName="${3:?DbName ausente}"
+DbUser="${4:?DbUser ausente}"
+DbPass="${5:?DbPass ausente}"
 
 # =======================
 # Atividades do MySQL
