@@ -4,7 +4,7 @@ set -euo pipefail
 # ==========================
 # Parâmetros da Conexão MySQL
 # ==========================
-DbHost="${1:-20.241.181.58:3306}"
+DbHost="${1:-20.241.181.58}"
 DbPort="${2:-3306}"
 DbName="${3:-ProjetoAutorLivroDb}"
 DbUser="${4:-root}"
