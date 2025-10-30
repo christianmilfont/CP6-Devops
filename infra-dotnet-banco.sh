@@ -37,6 +37,9 @@ az acr create \
   --sku Basic \
   --admin-enabled false 1>/dev/null
 
+# Habilitar admin no ACR
+az acr update -n "$ACR_NAME" --admin-enabled true
+
 # Captura credenciais do ACR
 ACR_USERNAME=$(az acr credential show -n "$ACR_NAME" --query username -o tsv)
 ACR_PASSWORD=$(az acr credential show -n "$ACR_NAME" --query passwords[0].value -o tsv)
