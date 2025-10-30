@@ -4,11 +4,11 @@ set -euo pipefail
 # ==========================
 # Parâmetros da Conexão MySQL
 # ==========================
-DbHost="${1:?DbHost ausente}"
-DbPort="${2:?DbPort ausente}"
-DbName="${3:?DbName ausente}"
-DbUser="${4:?DbUser ausente}"
-DbPass="${5:?DbPass ausente}"
+DbHost="${DbHost:?DbHost ausente}"         # Define a variável de ambiente DbHost
+DbPort="${DbPort:?DbPort ausente}"         # Define a variável de ambiente DbPort
+DbName="${DbName:?DbName ausente}"         # Define a variável de ambiente DbName
+DbUser="${DbUser:?DbUser ausente}"         # Define a variável de ambiente DbUser
+DbPass="${DbPass:?DbPass ausente}"         # Define a variável de ambiente DbPass
 
 # =======================
 # Atividades do MySQL
@@ -19,7 +19,8 @@ if ! command -v mysql >/dev/null 2>&1; then
 fi
 
 echo "Criando banco de dados se não existir..."
-mysql -h"$DbHost" -P"$DbPort" -u"$DbUser" -p"$DbPass" -e "CREATE DATABASE IF NOT EXISTS \`$DbName\`;"
+mysql --protocol=TCP -h"$DbHost" -P"$DbPort" -u"$DbUser" -p"$DbPass" -e "CREATE DATABASE IF NOT EXISTS \`$DbName\`;"
+
 
 echo "Criando Script de Banco..."
 cat > cria_objetos.sql <<'SQL'
@@ -42,7 +43,7 @@ CREATE INDEX IX_Livro_AutorId ON Livro (AutorId);
 SQL
 
 echo "Executando cria_objetos.sql..."
-mysql -h"$DbHost" -P"$DbPort" -u"$DbUser" -p"$DbPass" "$DbName" < cria_objetos.sql
+mysql --protocol=TCP -h"$DbHost" -P"$DbPort" -u"$DbUser" -p"$DbPass" "$DbName" < cria_objetos.sql
 echo "[OK] Objetos do BD prontos"
 
 
