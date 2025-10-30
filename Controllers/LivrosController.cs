@@ -5,32 +5,83 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CP6_DotNet.Controllers
 {
-    [Route("api/[controller]")]
+   [Route("api/[controller]")]
     [ApiController]
     public class LivrosController : ControllerBase
     {
         private readonly AppDbContext _context;
-
+ 
         public LivrosController(AppDbContext context)
         {
             _context = context;
         }
-
-        // GET: api/Livros
+ 
+        // GET: api/Livro
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Livro>>> GetLivros()
         {
             return await _context.Livros.Include(l => l.Autor).ToListAsync();
         }
-
-        // POST: api/Livros
+ 
+        // GET: api/Livro/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Livro>> GetLivro(int id)
+        {
+            var livro = await _context.Livros.Include(l => l.Autor)
+                                             .FirstOrDefaultAsync(l => l.Id == id);
+ 
+            if (livro == null)
+                return NotFound();
+ 
+            return livro;
+        }
+ 
+        // POST: api/Livro
         [HttpPost]
         public async Task<ActionResult<Livro>> PostLivro(Livro livro)
         {
             _context.Livros.Add(livro);
             await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetLivros), new { id = livro.Id }, livro);
+ 
+            return CreatedAtAction(nameof(GetLivro), new { id = livro.Id }, livro);
+        }
+ 
+        // PUT: api/Livro/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutLivro(int id, Livro livro)
+        {
+            if (id != livro.Id)
+                return BadRequest();
+ 
+            _context.Entry(livro).State = EntityState.Modified;
+ 
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.Livros.Any(l => l.Id == id))
+                    return NotFound();
+                else
+                    throw;
+            }
+ 
+            return NoContent();
+        }
+ 
+        // DELETE: api/Livro/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteLivro(int id)
+        {
+            var livro = await _context.Livros.FindAsync(id);
+            if (livro == null)
+                return NotFound();
+ 
+            _context.Livros.Remove(livro);
+            await _context.SaveChangesAsync();
+ 
+            return NoContent();
         }
     }
 }
