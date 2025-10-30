@@ -11,30 +11,33 @@ LOCATION="eastus"
 ACI_APP_NAME="${APP_NAME}-app"
 ACI_DB_NAME="${APP_NAME}-db"
 
-# Gera sufixo aleatório para nomes únicos de recursos
+# Gera sufixo aleatório para nomes únicos
 SUFFIX=$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w5 | head -n1)
 ACR_NAME="${APP_NAME}acr${SUFFIX}"
 IMAGE_NAME="${ACR_NAME}.azurecr.io/${APP_NAME}:latest"
 
-# Configurações do app
+# Portas
 APP_PORT=8080
-
-# Configurações do MySQL
 MYSQL_PORT=3306
+
+# MySQL
 MYSQL_ROOT_PASSWORD="Senha123!"
 MYSQL_DATABASE="ProjetoAutorLivroDb"
 
 # ================================
-# LOGIN E CONFIGURAÇÃO
+# LOGIN NO AZURE
 # ================================
 echo "🔐 Verificando login no Azure..."
 az account show &>/dev/null || az login
 
+# ================================
+# CRIAR RESOURCE GROUP
+# ================================
 echo "📁 Criando Resource Group..."
 az group create --name "$RESOURCE_GROUP" --location "$LOCATION" 1>/dev/null
 
 # ================================
-# CRIAR REGISTRY (ACR)
+# CRIAR ACR
 # ================================
 echo "📦 Criando Azure Container Registry (ACR)..."
 az acr create \
@@ -43,39 +46,18 @@ az acr create \
   --sku Basic \
   --admin-enabled true 1>/dev/null
 
-echo "🔑 Fazendo login no ACR..."
-az acr login --name "$ACR_NAME"
-
 # Captura credenciais do ACR
 ACR_USERNAME=$(az acr credential show -n "$ACR_NAME" --query username -o tsv)
 ACR_PASSWORD=$(az acr credential show -n "$ACR_NAME" --query passwords[0].value -o tsv)
 
 # ================================
-# SUBIR IMAGEM DO MYSQL PARA O ACR
+# BUILD DO APP .NET DIRETO NO ACR (ACR Tasks)
 # ================================
-echo "🐬 Subindo imagem do MySQL para o ACR..."
-docker pull mysql:8.0
-docker tag mysql:8.0 "${ACR_NAME}.azurecr.io/mysql:8.0"
-docker push "${ACR_NAME}.azurecr.io/mysql:8.0"
-
-# ================================
-# BUILD E PUSH DO APP .NET
-# ================================
-echo "⚙️  Buildando imagem da aplicação .NET..."
-docker build -t "$IMAGE_NAME" .
-
-echo "🚀 Fazendo push da imagem para o ACR..."
-docker push "$IMAGE_NAME"
-
-# ================================
-# LIMPAR CONTAINERS ANTIGOS
-# ================================
-echo "🧹 Removendo containers antigos (se existirem)..."
-az container delete --name "$ACI_DB_NAME" --resource-group "$RESOURCE_GROUP" --yes || true
-az container delete --name "$ACI_APP_NAME" --resource-group "$RESOURCE_GROUP" --yes || true
-
-echo "⏳ Aguardando limpeza (10s)..."
-sleep 10
+echo "⚙️  Buildando imagem da aplicação no ACR (ACR Tasks)..."
+az acr build \
+  --registry "$ACR_NAME" \
+  --image "${APP_NAME}:latest" \
+  .
 
 # ================================
 # CRIAR MYSQL NO ACI
@@ -84,7 +66,7 @@ echo "🛢️ Criando container do MySQL..."
 az container create \
   --resource-group "$RESOURCE_GROUP" \
   --name "$ACI_DB_NAME" \
-  --image "${ACR_NAME}.azurecr.io/mysql:8.0" \
+  --image "mysql:8.0" \
   --cpu 1 --memory 1.5 \
   --ip-address public \
   --ports "$MYSQL_PORT" \
@@ -92,10 +74,7 @@ az container create \
       MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" \
       MYSQL_DATABASE="$MYSQL_DATABASE" \
   --restart-policy Always \
-  --os-type Linux \
-  --registry-login-server "${ACR_NAME}.azurecr.io" \
-  --registry-username "$ACR_USERNAME" \
-  --registry-password "$ACR_PASSWORD"
+  --os-type Linux
 
 echo "⏳ Aguardando MySQL inicializar (60s)..."
 sleep 60
@@ -123,7 +102,7 @@ echo "⏳ Aguardando aplicação subir (60s)..."
 sleep 60
 
 # ================================
-# EXIBIR RESULTADOS
+# RESULTADOS
 # ================================
 APP_IP=$(az container show --resource-group "$RESOURCE_GROUP" --name "$ACI_APP_NAME" --query ipAddress.ip -o tsv)
 DB_IP=$(az container show --resource-group "$RESOURCE_GROUP" --name "$ACI_DB_NAME" --query ipAddress.ip -o tsv)
