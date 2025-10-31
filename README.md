@@ -37,10 +37,13 @@ Automatiza tambem a criação do banco de dados e conexão com meu banco na nuve
 Automatiza a criação de service connections, resource groups e registries.
 
 ```bash
-chmod +x infra-pipeline-setup.sh
+chmod +x infra-app.sh
 ./infra-app.sh
 ```
-
+(CASO PRECISE)
+```bash
+dos2unix infra-app.sh
+```
 
 ### infra-dotnet-banco.sh
 
@@ -56,8 +59,12 @@ Efetua o push da imagem para o repositório remoto no Azure.
 Cria grupo de recursos, além de registrar a imagem a ser lançada.
 
 ```bash
-chmod +x build-mysql-push-acr.sh
+chmod +x infra-dotnet-banco.sh
 ./infra-dotnet-banco.sh
+```
+(CASO PRECISE)
+```bash
+dos2unix infra-dotnet-banco.sh
 ```
 
 ## Script-bd-sql
@@ -125,7 +132,7 @@ dotnet run
 
 Acesse a API localmente:
 ```bash
-http://localhost:5000
+http://localhost:5000/swagger
 ```
 
 
