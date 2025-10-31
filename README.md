@@ -127,6 +127,16 @@ Já nessa podemos observar que ele traz do nosso Artefato gerado, as Atividades 
 
 <img width="1343" height="203" alt="image" src="https://github.com/user-attachments/assets/fc552e2d-2bdc-4d46-aeaa-0790805e637f" />
 
+---
+
+Para acessar o nosso projeto em nuvem:
+
+<img width="668" height="34" alt="image" src="https://github.com/user-attachments/assets/64fb975b-60ba-49f8-822c-952646d57a1b" />
+
+```bash
+http://meu-app-dotnet.azurewebsites.net
+```
+
 ## Estrutura do Repositório
 ```bash
 CP6-Devops/
