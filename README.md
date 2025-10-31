@@ -89,18 +89,43 @@ A integração com o Azure DevOps permite:
 ## Principais Serviços Azure:
 
 
-Azure DevOps Pipelines
+### Azure DevOps Pipelines
 
+Nessas imagens podemos observar justamente nossa pipeline CI sendo disparada após um commit no codigo presente no Repos! 
 
-- Azure Container Registry (ACR)
+<img width="1249" height="209" alt="image" src="https://github.com/user-attachments/assets/e86657dc-544a-401a-9887-de7c7d6240d1" />
 
+---
 
-- Azure App Service com um Plano de aplicativo, o qual meu script **infra-app.sh** é responsavel
+<img width="1462" height="888" alt="image" src="https://github.com/user-attachments/assets/0f008558-11ec-49c2-a25c-673ec640e3a3" />
 
+---
 
-- Azure CLI
+Aqui nossa política da Branch, as quais definimos dentro das configurações da Organização Repos e tabém na Pipeline!
 
+<img width="352" height="306" alt="image" src="https://github.com/user-attachments/assets/2c7ca5eb-922a-4551-b838-a200eabf7021" />
 
+### Azure Container Registry (ACR)
+
+---
+
+### Azure App Service com um Plano de aplicativo, o qual meu script **infra-app.sh** é responsavel
+
+---
+
+### Azure CLI
+
+---
+
+### Azure DevOps Pipelines CD (RELEASE)
+
+Nessa imagem podemos observar o deploy feito de forma automatizada após disparar um CI em nosso Azure DevOps.
+
+<img width="1344" height="632" alt="image" src="https://github.com/user-attachments/assets/1db52465-a3c9-4c0d-b62c-6969107a800f" />
+
+Já nessa podemos observar que ele traz do nosso Artefato gerado, as Atividades geradas e testadas em nosso CI.
+
+<img width="1343" height="203" alt="image" src="https://github.com/user-attachments/assets/fc552e2d-2bdc-4d46-aeaa-0790805e637f" />
 
 ## Estrutura do Repositório
 ```bash
