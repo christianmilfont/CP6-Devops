@@ -1,17 +1,17 @@
-﻿using CP6_DotNet.Context;
+using CP6_DotNet.Context;
 using CP6_DotNet.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+ 
 namespace CP6_DotNet.Controllers
 {
-   [Route("api/[controller]")]
+[Route("api/[controller]")]
     [ApiController]
-    public class LivrosController : ControllerBase
+    public class LivroController : ControllerBase
     {
         private readonly AppDbContext _context;
  
-        public LivrosController(AppDbContext context)
+        public LivroController(AppDbContext context)
         {
             _context = context;
         }
