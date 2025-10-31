@@ -60,7 +60,8 @@ chmod +x build-mysql-push-acr.sh
 ./infra-dotnet-banco.sh
 ```
 
-
+## Script-bd-sql
+Apenas contempla o script presente no nosso **infra-app.sh**, ele ja automatiza a criação do nosso Database e suas respectivas tabelas.
 
 # Integração com Azure
 A integração com o Azure DevOps permite:
