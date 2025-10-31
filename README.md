@@ -98,21 +98,16 @@ Azure DevOps Pipelines
 ## Estrutura do Repositório
 ```bash
 CP6-Devops/
-├── src/
-│   └── Api/
 │       ├── Controllers/
 │       ├── Models/
+│       ├── Context/
 │       ├── Program.cs
 │       └── appsettings.json
-├── docker/
-│   └── mysql/
-│       └── Dockerfile
-├── pipelines/
+│   └── Dockerfile (caso seja necessário)
 │   └── azure-pipelines.yml
-├── infra/
-│   ├── infra-pipeline-setup.sh
-│   └── build-mysql-push-acr.sh
-└── README.md
+│   ├── infra-app.sh
+│   └── infra-dotnet-banco.sh
+    └── README.md
 ```
 
 ## Como Executar Localmente
