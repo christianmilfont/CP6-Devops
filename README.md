@@ -38,11 +38,11 @@ Automatiza a criação de service connections, resource groups e registries.
 
 ```bash
 chmod +x infra-pipeline-setup.sh
-./infra-pipeline-setup.sh
+./infra-app.sh
 ```
 
 
-### deploy-bd-only.sh
+### infra-dotnet-banco.sh
 
 
 Faz o build local da imagem Docker do MySQL configurada para o projeto.
@@ -53,9 +53,11 @@ Realiza o login no Azure Container Registry (ACR).
 
 Efetua o push da imagem para o repositório remoto no Azure.
 
+Cria grupo de recursos, além de registrar a imagem a ser lançada.
+
 ```bash
 chmod +x build-mysql-push-acr.sh
-./build-mysql-push-acr.sh
+./infra-dotnet-banco.sh
 ```
 
 
