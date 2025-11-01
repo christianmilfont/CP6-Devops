@@ -19,6 +19,10 @@ Backend:
 
 - Docker — Para empacotamento da aplicação e do banco em containers independentes.
 
+---
+
+### Pull requets:
+<img width="1641" height="319" alt="image" src="https://github.com/user-attachments/assets/26d30e0f-2354-4130-b331-8bccc380754e" />
 
 
 # Infraestrutura e Automação
